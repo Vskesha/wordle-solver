@@ -53,11 +53,11 @@ def get_words_from_txt(txt_file_path: str | None) -> str:
 
 def show_words(words: list[str], num_words: int = 10) -> None:
     if not words:
-        print("No more words to show.")
+        print(Fore.RED + "No more words to show." + Fore.GREEN)
         return
 
     random.shuffle(words)
-    print("\n".join(words[:num_words]))
+    print(Fore.CYAN + "\n".join(words[:num_words]) + Fore.GREEN)
 
 
 def main():
