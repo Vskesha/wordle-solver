@@ -62,6 +62,7 @@ def show_words(words: list[str], num_words: int = 10) -> None:
 
 def main():
     words = get_words_from_json(WORDS_JSON_FILE_PATH, 5, 5)
+    word_chars = set()
     random.shuffle(words)
 
     print(HELP)
@@ -102,9 +103,13 @@ def main():
                 print(GUESS_COMMAND)
                 continue
 
-            _, quess, presence = splitted
-            for i, char, pres in zip(range(5), quess.upper(), presence):
+            _, guess, presence = splitted
+            for i, char, pres in zip(range(5), guess.upper(), presence):
                 if pres == "0":
+                    if char in word_chars:
+                        if guess.upper() in words:
+                            words.remove(guess.upper())
+                        continue
                     words = [
                         word for word in words
                         if char not in word
@@ -114,11 +119,13 @@ def main():
                         word for word in words
                         if char in word and word[i] != char
                     ]
+                    word_chars.add(char)
                 elif pres == "2":
                     words = [
                         word for word in words
                         if word[i] == char
                     ]
+                    word_chars.add(char)
 
             show_words(words, 10)
 
