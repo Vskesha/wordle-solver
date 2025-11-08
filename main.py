@@ -1,5 +1,5 @@
 import json
-import random
+from collections import Counter
 from pathlib import Path
 
 from colorama import init as init_colorama, Fore
@@ -30,40 +30,39 @@ def get_words_from_json(
         min_length: int = 1,
         max_length: int = 100,
         upper_case: bool = True,
-) -> list[str]:
+) -> Counter:
     try:
         with open(json_file_path, "r", encoding="utf-8") as file:
             json_data = json.load(file)
-            return [
-                word.upper() if upper_case else word.lower()
-                for word in json_data.keys()
+            return Counter({
+                (word.upper() if upper_case else word): count
+                for word, count in json_data.items()
                 if min_length <= len(word) <= max_length
-            ]
+            })
     except FileNotFoundError:
-        return []
+        return Counter()
     except json.JSONDecodeError:
-        return []
+        return Counter()
     except Exception:
-        return []
+        return Counter()
 
 
 def get_words_from_txt(txt_file_path: str | None) -> str:
     ...
 
 
-def show_words(words: list[str], num_words: int = 10) -> None:
+def show_words(words: Counter, num_words: int = 10) -> None:
     if not words:
-        print(Fore.RED + "No more words to show." + Fore.GREEN)
+        print(Fore.RED + "No words to show." + Fore.GREEN)
         return
 
-    random.shuffle(words)
-    print(Fore.CYAN + "\n".join(words[:num_words]) + Fore.GREEN)
+    top_words = [word for word, _ in words.most_common(num_words)]
+    print(Fore.CYAN + "\n".join(top_words) + Fore.GREEN)
 
 
 def main():
-    words = get_words_from_json(WORDS_JSON_FILE_PATH, 5, 5)
+    words = get_words_from_json(WORDS_JSON_FILE_PATH, 5, 5, True)
     word_chars = set()
-    random.shuffle(words)
 
     print(HELP)
 
@@ -108,23 +107,20 @@ def main():
                 if pres == "0":
                     if char in word_chars:
                         if guess.upper() in words:
-                            words.remove(guess.upper())
+                            words.pop(guess.upper())
                         continue
-                    words = [
-                        word for word in words
-                        if char not in word
-                    ]
+                    for word in list(words.keys()):
+                        if char in word:
+                            words.pop(word)
                 elif pres == "1":
-                    words = [
-                        word for word in words
-                        if char in word and word[i] != char
-                    ]
+                    for word in list(words.keys()):
+                        if char not in word or word[i] == char:
+                            words.pop(word)
                     word_chars.add(char)
                 elif pres == "2":
-                    words = [
-                        word for word in words
-                        if word[i] == char
-                    ]
+                    for word in list(words.keys()):
+                        if word[i] != char:
+                            words.pop(word)
                     word_chars.add(char)
 
             show_words(words, 10)
