@@ -7,6 +7,7 @@ from colorama import init as init_colorama, Fore
 init_colorama()
 
 WORDS_JSON_FILE_PATH = Path(__file__).parent.joinpath("words/words.json")
+WORDS_TXT_FILE_PATH = Path(__file__).parent.joinpath("words/words_freq.txt")
 
 GUESS_COMMAND = Fore.YELLOW + "filter CCCCC XXXXX " + Fore.GREEN + """- For filtering words.
                      CCCCC - 5 characters word (case insensitive)
@@ -47,8 +48,37 @@ def get_words_from_json(
         return Counter()
 
 
-def get_words_from_txt(txt_file_path: str | None) -> str:
-    ...
+def get_words_from_txt(
+        txt_file_path: str | Path,
+        min_length: int = 1,
+        max_length: int = 100,
+        upper_case: bool = True,
+
+) -> Counter:
+    try:
+        words = Counter()
+
+        with open(txt_file_path, "r", encoding="utf-8") as file:
+            for line in file:
+                splitted_line = line.split()
+                if len(splitted_line) == 0:
+                    continue
+                word = splitted_line[0]
+                if len(word) < min_length or len(word) > max_length:
+                    continue
+                if upper_case:
+                    word = word.upper()
+                freq = 1
+                if len(splitted_line) > 1 and splitted_line[1].isdigit():
+                    freq = int(splitted_line[1])
+                words[word] = freq
+
+        return words
+
+    except FileNotFoundError:
+        return Counter()
+    except Exception:
+        return Counter()
 
 
 def show_words(words: Counter, num_words: int = 10) -> None:
@@ -61,7 +91,7 @@ def show_words(words: Counter, num_words: int = 10) -> None:
 
 
 def main():
-    words = get_words_from_json(WORDS_JSON_FILE_PATH, 5, 5, True)
+    words = get_words_from_txt(WORDS_TXT_FILE_PATH, 5, 5, True)
     word_chars = set()
 
     print(HELP)
