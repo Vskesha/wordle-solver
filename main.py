@@ -133,6 +133,11 @@ def main():
                 continue
 
             _, guess, presence = splitted
+
+            for char, pres in zip(guess.upper(), presence):
+                if pres in "12":
+                    word_chars.add(char)
+
             for i, char, pres in zip(range(5), guess.upper(), presence):
                 if pres == "0":
                     if char in word_chars:
@@ -146,12 +151,10 @@ def main():
                     for word in list(words.keys()):
                         if char not in word or word[i] == char:
                             words.pop(word)
-                    word_chars.add(char)
                 elif pres == "2":
                     for word in list(words.keys()):
                         if word[i] != char:
                             words.pop(word)
-                    word_chars.add(char)
 
             show_words(words, 10)
 
