@@ -141,8 +141,9 @@ def main():
             for i, char, pres in zip(range(5), guess.upper(), presence):
                 if pres == "0":
                     if char in word_chars:
-                        if guess.upper() in words:
-                            words.pop(guess.upper())
+                        for word in list(words.keys()):
+                            if word[i] == char:
+                                words.pop(word)
                         continue
                     for word in list(words.keys()):
                         if char in word:
