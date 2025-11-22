@@ -86,6 +86,7 @@ def show_words(words: Counter, num_words: int = 10) -> None:
         print(Fore.RED + "No words to show." + Fore.GREEN)
         return
 
+    print(Fore.YELLOW + f"Top {min(num_words, len(words))} from {len(words)} words:")
     top_words = [word for word, _ in words.most_common(num_words)]
     print(Fore.CYAN + "\n".join(top_words) + Fore.GREEN)
 
