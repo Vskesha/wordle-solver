@@ -86,9 +86,14 @@ def show_words(words: Counter, num_words: int = 10) -> None:
         print(Fore.RED + "No words to show." + Fore.GREEN)
         return
 
-    print(Fore.YELLOW + f"Top {min(num_words, len(words))} from {len(words)} words:")
-    top_words = [word for word, _ in words.most_common(num_words)]
-    print(Fore.CYAN + "\n".join(top_words) + Fore.GREEN)
+    if len(words) > 1:
+        print(Fore.YELLOW + f"Top {min(num_words, len(words))} from {len(words)} words:")
+        top_words = [word for word, _ in words.most_common(num_words)]
+        print(Fore.CYAN + "\n".join(top_words) + Fore.GREEN)
+    elif len(words) == 1:
+        print(f"{Fore.GREEN}Congratulations! You found the word:\n{Fore.CYAN}{list(words.keys())[0]}")
+    else:
+        print(Fore.RED + "No words to show." + Fore.GREEN)
 
 
 def main():
@@ -163,6 +168,9 @@ def main():
         else:
             print(Fore.RED + "Invalid command. Please use the format:")
             print(HELP)
+
+        if len(words) < 2:
+            break
 
 
 if __name__ == '__main__':
